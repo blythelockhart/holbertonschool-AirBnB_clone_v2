@@ -1,4 +1,4 @@
-#!/bin/bash/python3
+#!/usr/bin/python3
 """ Database Storage. """
 import os
 from sqlalchemy import create_engine
