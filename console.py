@@ -31,55 +31,17 @@ class HBNBCommand(cmd.Cmd):
             }
 
     def preloop(self):
-        """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb)')
-
-    def precmd(self, line):
-        """Reformat command line for advanced command syntax.
-
-        Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
-        (Brackets denote optional fields in usage example.)
-        """
-        # scan for general formating - i.e '.', '(', ')'
-        if not ('.' in line and '(' in line and ')' in line):
-            return line
-        try:  # parse line left to right
-            pline = line[:]
-            _cls = pline[:pline.find('.')]
-            _cmd = pline[pline.find('.') + 1:pline.find('(')]
-
-            if _cmd not in HBNBCommand.dot_cmds:
-                raise Exception
-            # if parantheses contain arguments, parse them
-            pline = pline[pline.find('(') + 1:pline.find(')')]
-
-            if pline:
-                # partition args: (<id>, [<delim>], [<*args>])
-                pline = pline.partition(', ')  # pline convert to tuple
-                _id = pline[0].strip('"')
-                if pline[2]:  # if arguments exist beyond _id
-                    # check for *args or **kwargs
-                    if pline[2][0] == '{' and pline[2][-1] == '}' \
-                            and type(eval(pline[2])) == dict:
-                        _args = eval(pline[2])
-                    else:
-                        _args = pline[2].replace(',', '')
-            line = ' '.join([_cmd, _cls, _id, _args])
-        except Exception as mess:
-            pass
-        finally:
-            return line
+         """Prints if isatty is false"""
+        print(prompt)
 
     def postcmd(self, stop, line):
         """Prints if isatty is false"""
-        if not sys.__stdin__.isatty():
-            print('(hbnb) ', end='')
+        print(prompt)
         return stop
 
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
-        exit()
+        return True
 
     def help_quit(self):
         """ Prints the help documentation for quit  """
@@ -88,7 +50,7 @@ class HBNBCommand(cmd.Cmd):
     def do_EOF(self, arg):
         """ Handles EOF to exit program """
         print()
-        exit()
+        return True
 
     def help_EOF(self):
         """ Prints the help documentation for EOF """
@@ -103,15 +65,15 @@ class HBNBCommand(cmd.Cmd):
         if not args:
             print("** class name missing **")
             return
-        class_name, *params = args.split()
+        class_names = args.split()
 
-        if class_name not in HBNBCommand.classes:
+        if class_names[0] not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        attr_dict = []
+        attr_dict = {}
 
-        for param in params:
-            key, value = param.split('=')
+        for class_name in class_names:
+            key, value = class_name.split('=')
 
             if key and value:
                 value = value.strip('"').replace('\\"', '"').replace('_', ' ')
@@ -127,9 +89,7 @@ class HBNBCommand(cmd.Cmd):
                     except ValueError:
                         continue
                 attr_dict[key] = value
-            else:
-                continue
-        new_instance = HBNBCommand.classes[class_name](**attr_dict)
+        new_instance = HBNBCommand.classes[class_names[0]](**attr_dict)
         new_instance.save()
         print(new_instance.id)
 
@@ -140,31 +100,27 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, args):
         """ Method to show an individual object """
-        new = args.partition(" ")
-        c_name = new[0]
-        c_id = new[2]
+        arg = args.split()
+        class_name = arg[0]
+        class_id = arg[1]
 
-        # guard against trailing args
-        if c_id and ' ' in c_id:
-            c_id = c_id.partition(' ')[0]
-
-        if not c_name:
+        if not class_name:
             print("** class name missing **")
             return
-
-        if c_name not in HBNBCommand.classes:
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        if not c_id:
+        if not class_id:
             print("** instance id missing **")
             return
-        key = c_name + "." + c_id
+        key = class_name + "." + class_id
 
         try:
             print(storage.all()[key])
+            return
         except KeyError:
             print("** no instance found **")
+            return
 
     def help_show(self):
         """ Help information for the show command """
@@ -173,30 +129,28 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, args):
         """ Destroys a specified object """
-        new = args.partition(" ")
-        c_name = new[0]
-        c_id = new[2]
-        if c_id and ' ' in c_id:
-            c_id = c_id.partition(' ')[0]
+        arg = args.split()
+        class_name = arg[0]
+        class_id = arg[1]
 
-        if not c_name:
+        if not class_name:
             print("** class name missing **")
             return
-
-        if c_name not in HBNBCommand.classes:
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        if not c_id:
+        if not class_id:
             print("** instance id missing **")
             return
-        key = c_name + "." + c_id
+        key = class_name + "." + class_id
 
         try:
             del storage.all()[key]
             storage.save()
+            return
         except KeyError:
             print("** no instance found **")
+            return
 
     def help_destroy(self):
         """ Help information for the destroy command """
@@ -208,16 +162,16 @@ class HBNBCommand(cmd.Cmd):
         print_list = []
 
         if args:
-            args = args.split(' ')[0]  # remove possible trailing args
-            if args not in HBNBCommand.classes:
+            arg = args.split()  # remove possible trailing args
+            if arg[0] not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage.all().items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            for key, val in storage.all().items:
+                if arg[0] in key:
+                    print_list.append(str(val))
         else:
-            for k, v in storage.all().items():
-                print_list.append(str(v))
+            for key, val in storage.all().items():
+                print_list.append(str(val))
         print(print_list)
 
     def help_all(self):
@@ -240,62 +194,36 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, args):
         """ Updates a certain object with new info """
-        c_name = c_id = att_name = att_val = kwargs = ''
-        # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
-        args = args.partition(" ")
+        arg = args.split()
+        class_name = arg[0]
+        class_id = arg[1]
+        att_name = arg[2]
+        att_val = arg[3]
 
-        if args[0]:
-            c_name = args[0]
-        else:
+        if not class_name:
             print("** class name missing **")
             return
-        if c_name not in HBNBCommand.classes:
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        # isolate id from args
-        args = args[2].partition(" ")
-
-        if args[0]:
-            c_id = args[0]
-        else:  # id not present
+        if not class_id:
             print("** instance id missing **")
             return
-        key = c_name + "." + c_id
+        key = class_name + "." + class_id
 
         if key not in storage.all():
             print("** no instance found **")
             return
-        args = args[2]
-
-        if args and args[0] == '\"':
-            second_quote = args.find('\"', 1)
-            att_name = args[1:second_quote]
-            args = args[second_quote + 1:]
-        args = args.partition(' ')
-
-        if not att_name and args[0] != ' ':
-            att_name = args[0]
-        if args[2] and args[2][0] == '\"':
-            att_val = args[2][1:args[2].find('\"', 1)]
-        if not att_val and args[2]:
-            att_val = args[2].partition(' ')[0]
-        args = [att_name, att_val]
-        new_dict = storage.all()[key]
-
-        for i, name in enumerate(args):
-            # block only runs on even iterations
-            if i % 2 == 0:
-                att_val = args[i + 1]  # following item is value
-                if not name:
-                    print("** attribute name missing **")
-                    return
-                if not att_val:
-                    print("** value missing **")
-                    return
-                if name in HBNBCommand.types:
-                    att_val = HBNBCommand.types[name](att_val)
-                setattr(new_dict, name, att_val)
-        new_dict.save()  # save updates to file
+        if not att_name:
+            print("** attribute name missing **")
+            return
+        if not att_val:
+            print("** value missing **")
+            return
+        if att_name in HBNBCommand.types:
+            att_val = HBNBCommand.types[att_name](att_val)
+        setattr(storage.all()[key], att_name, att_val)
+        storage.all()[key].save()
 
     def help_update(self):
         """ Help information for the update class """
