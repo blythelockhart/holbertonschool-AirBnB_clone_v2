@@ -17,18 +17,22 @@ class BaseModel:
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, *args, **kwargs):
-        """Instatntiates a new model"""
+        """Instantiates a new model"""
+        t = '%Y-%m-%dT%H:%M:%S.%f'
         if not kwargs:
             self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
+            self.created_at, self.updated_at = datetime.utcnow()
         else:
-            if '_sa_instance_state' in kwargs:
-                del kwargs['_sa_instance_state']
-            kwargs['updated_at'] = datetime.strptime(kwargs['updated_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
-            kwargs['created_at'] = datetime.strptime(kwargs['created_at'],
-                                                     '%Y-%m-%dT%H:%M:%S.%f')
+            if "id" not in kwargs:
+                self.id = str(uuid.uuid4())
+            if "created_at" not in kwargs:
+                self.created_at = datetime.utcnow()
+            if "updated_at" not in kwargs:
+                self.updated_at = datetime.utcnow()
+            for k, v in self.__dict__.items():
+                if isinstance(v, str) and ('created_at' in k or \
+                                           'updated_at' in k):
+                    self.__dict__[k] = datetime.strptime(v, t)
             self.__dict__.update(kwargs)
 
     def __str__(self):
@@ -38,7 +42,7 @@ class BaseModel:
 
     def save(self):
         """Updates updated_at with current time when instance is changed"""
-        self.updated_at = datetime.now()
+        self.updated_at = datetime.utcnow()
         storage.new(self)
         storage.save()
 
@@ -48,6 +52,8 @@ class BaseModel:
         dictionary.update({'__class__': self.__class__.__name__})
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
+        if dictionary['_sa_instance_state']:
+                del dictionary['_sa_instance_state']
         return dictionary
 
     def delete(self):
