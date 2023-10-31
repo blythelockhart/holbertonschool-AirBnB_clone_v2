@@ -3,7 +3,7 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+from models import storage
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -14,10 +14,11 @@ from models.review import Review
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
-
     # determines prompt for interactive/non-interactive modes
-    prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
-
+    if sys.__stdin__.isatty():
+        prompt = '(hbnb) '
+    else:
+        prompt = ''
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
@@ -29,15 +30,6 @@ class HBNBCommand(cmd.Cmd):
              'max_guest': int, 'price_by_night': int,
              'latitude': float, 'longitude': float
             }
-
-    def preloop(self):
-         """Prints if isatty is false"""
-        print(prompt)
-
-    def postcmd(self, stop, line):
-        """Prints if isatty is false"""
-        print(prompt)
-        return stop
 
     def do_quit(self, command):
         """ Method to exit the HBNB console"""
@@ -62,34 +54,33 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
-            print("** class name missing **")
-            return
-        class_names = args.split()
-
-        if class_names[0] not in HBNBCommand.classes:
-            print("** class doesn't exist **")
-            return
+        arg = args.split()
+        class_name = arg[0]
         attr_dict = {}
 
-        for class_name in class_names:
-            key, value = class_name.split('=')
+        if not class_name:
+            print("** class name missing **")
+            return
+        if class_name not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
+        for value in arg:
+            if '=' in value:
+                key, val = value.split('=')
+                val = val.strip('"').replace('\\"', '"').replace('_', ' ')
 
-            if key and value:
-                value = value.strip('"').replace('\\"', '"').replace('_', ' ')
-
-                if '.' in value:
+                if '.' in val:
                     try:
-                        value = float(value)
+                        val = float(val)
                     except ValueError:
                         continue
                 else:
                     try:
-                        value = int(value)
+                        val = int(val)
                     except ValueError:
                         continue
-                attr_dict[key] = value
-        new_instance = HBNBCommand.classes[class_names[0]](**attr_dict)
+                attr_dict[key] = val
+        new_instance = HBNBCommand.classes[class_name](**attr_dict)
         new_instance.save()
         print(new_instance.id)
 
@@ -189,7 +180,7 @@ class HBNBCommand(cmd.Cmd):
         print(count)
 
     def help_count(self):
-        """ """
+        """ Help information for the count command """
         print("Usage: count <class_name>")
 
     def do_update(self, args):

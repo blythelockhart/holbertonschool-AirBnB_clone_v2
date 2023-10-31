@@ -33,13 +33,13 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Query all objects in the database session."""
+        """All objects in the database session."""
         obj_dict = {}
         classes = [User, State, City, Amenity, Place, Review]
 
         if cls:
             if isinstance(cls, str):
-                cls = eval(cls)
+                cls = classes.get(cls, None)
             objects = self.__session.query(cls).all()
         else:
             objects = []

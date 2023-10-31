@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String, Integer, Float, Table
-from sqlalchemy.schema import ForeignKey
+from sqlalchemy import Column, String, Integer, Float, Table, ForeignKey
 from sqlalchemy.orm import relationship
 from models.review import Review
 from models.amenity import Amenity
@@ -33,16 +32,5 @@ class Place(BaseModel, Base):
     __tablename__ = 'places'
     reviews = relationship("Review", cascade="all, delete-orphan",
                            backref="place")
-    amenities = relationship("Amenity", secondary=place_amenity,
+    amenities = relationship("Amenity", secondary="place_amenity",
                              viewonly=False, back_populates="place_amenities")
-
-    @property
-    def amenities(self):
-        """ Getter attribute for amenities """
-        return self.amenity_ids
-
-    @amenities.setter
-    def amenities(self, amenity):
-        """ Setter attribute for amenities """
-        if isinstance(amenity, Amenity):
-            self.amenity_ids.append(amenity.id)

@@ -21,7 +21,8 @@ class BaseModel:
         t = '%Y-%m-%dT%H:%M:%S.%f'
         if not kwargs:
             self.id = str(uuid.uuid4())
-            self.created_at, self.updated_at = datetime.utcnow()
+            self.created_at = datetime.utcnow()
+            self.updated_at = datetime.utcnow()
         else:
             if "id" not in kwargs:
                 self.id = str(uuid.uuid4())
@@ -30,7 +31,7 @@ class BaseModel:
             if "updated_at" not in kwargs:
                 self.updated_at = datetime.utcnow()
             for k, v in self.__dict__.items():
-                if isinstance(v, str) and ('created_at' in k or \
+                if isinstance(v, str) and ('created_at' in k or
                                            'updated_at' in k):
                     self.__dict__[k] = datetime.strptime(v, t)
             self.__dict__.update(kwargs)
@@ -52,8 +53,8 @@ class BaseModel:
         dictionary.update({'__class__': self.__class__.__name__})
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
-        if dictionary['_sa_instance_state']:
-                del dictionary['_sa_instance_state']
+        if '_sa_instance_state' in dictionary:
+            del dictionary['_sa_instance_state']
         return dictionary
 
     def delete(self):
