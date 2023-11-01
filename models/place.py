@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
+from os import getenv
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, Integer, ForeignKey, Float, Table
 from sqlalchemy.orm import relationship
@@ -33,26 +34,35 @@ class Place(BaseModel, Base):
     reviews = relationship("Review", cascade="all, delete-orphan",
                            backref="place")
     amenities = relationship("Amenity", secondary="place_amenity",
-                             viewonly=False, back_populates="place_amenities")
+                             viewonly=False,
+                             back_populates="place_amenities")
 
-    @property
-    def reviews(self):
-        """A list of Review instances with place_id equal to the current Place.id"""
-        review_list = []
-        all_reviews = models.storage.all(Review)
-        for review in all_reviews.values():
-            if review.place_id == self.id:
-                review_list.append(review)
-        return review_list
-
-    @property
-    def amenities(self):
-        """Getter for amenities attribute"""
-        return self.amenity_ids
-
-    @amenities.setter
-    def amenities(self, amenity):
-        """Setter for amenities attribute"""
-        if isinstance(amenity, Amenity):
-            if amernity.id not in self.amenity_ids:
-                self.amenity_ids.append(amenity.id)
+#    if getenv('HBNB_TYPE_STORAGE', None) != 'db':
+#        @property
+#        def reviews(self):
+#            """A list of Review instances with place_id equal to the current Place.id"""
+#            from models import storage
+#            review_list = []
+#            all_reviews = storage.all(Review)
+#            for review in all_reviews.values():
+#                if review.place_id == self.id:
+#                    review_list.append(review)
+#            return review_list
+#
+#        @property
+#        def amenities(self):
+#            """Getter for amenities attribute"""
+#            from models import storage
+#            amen_list = []
+#            all_amenities = storage.all(Amenity)
+#            for amenity in all_amenities.values():
+#                if amenity.id == self.amenity_ids:
+#                    amen_list.append(amenity)
+#            return amen_list
+#
+#        @amenities.setter
+#        def amenities(self, amenity):
+#            """Setter for amenities attribute"""
+#            if isinstance(amenity, Amenity):
+#                if amenity.id not in self.amenity_ids:
+#                    self.amenity_ids.append(amenity.id)
