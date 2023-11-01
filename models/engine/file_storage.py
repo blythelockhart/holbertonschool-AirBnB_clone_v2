@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 """This module defines a class to manage file storage for hbnb clone"""
 import json
+from datetime import datetime
 
 
 class FileStorage:
@@ -8,9 +9,12 @@ class FileStorage:
     __file_path = 'file.json'
     __objects = {}
 
-    def all(self):
+    def all(self, cls=None):
         """Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if cls:
+            return {k: v for k, v in self.__objects.items() \
+                    if isinstance(v, cls)}
+        return self.__objects
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
@@ -41,12 +45,21 @@ class FileStorage:
                     'Review': Review
                   }
         try:
-            temp = {}
-            with open(FileStorage.__file_path, 'r') as f:
+            with open(FileStorage.__file_path) as f:
                 temp = json.load(f)
-                for key, val in temp.items():
-                    self.all()[key] = classes[val['__class__']](**val)
+                time = "%Y-%m-%dT%H:%M:%S.%f"
+
+                for val in temp.values():
+                    class_name = val.get('__class__')
+                    if class_name:
+                        del val['__class__']
+                        for key, value in val.items():
+                            if key in ('created_at', 'updated_at'):
+                                val[key] = datetime.strptime(value, time)
+                        self.new(eval(class_name)(**val))
         except FileNotFoundError:
+            pass
+        except json.decoder.JSONDecodeError:
             pass
 
     def delete(self, obj=None):

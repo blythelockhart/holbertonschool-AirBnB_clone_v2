@@ -153,16 +153,16 @@ class HBNBCommand(cmd.Cmd):
         print_list = []
 
         if args:
-            arg = args.split()  # remove possible trailing args
+            arg = args.split()
             if arg[0] not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for key, val in storage.all().items:
-                if arg[0] in key:
-                    print_list.append(str(val))
+            for key, val in storage.all().items():
+                if arg[0] in val.__class__.__name__:
+                    print_list.append(val.__str__())
         else:
             for key, val in storage.all().items():
-                print_list.append(str(val))
+                print_list.append(val.__str__())
         print(print_list)
 
     def help_all(self):
