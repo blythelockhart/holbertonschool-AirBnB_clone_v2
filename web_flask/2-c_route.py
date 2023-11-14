@@ -1,10 +1,5 @@
 #!/usr/bin/python3
-"""
-Starts a Flask web application listening on 0.0.0.0, port 5000.
-Root route ("/") displays the message "Hello HBNB!".
-Root route ("/hbnb") displays “HBNB”.
-Root route ("/c/<text>") displays “C ” and the value of the text variable.
-"""
+""" Starts a Flask web application listening on 0.0.0.0, port 5000. """
 from flask import Flask, render_template
 
 app = Flask(__name__)
@@ -12,16 +7,19 @@ app = Flask(__name__)
 
 @app.route('/', strict_slashes=False)
 def hello_hbnb():
+    """ Root route ("/") displays the message "Hello HBNB!". """
     return 'Hello HBNB!'
 
 
 @app.route('/hbnb', strict_slashes=False)
 def display_hbnb():
+    """ Root route ("/hbnb") displays “HBNB”. """
     return 'HBNB'
 
 
 @app.route('/c/<text>', strict_slashes=False)
 def display_c_text(text):
+    """ Root route ("/c/<text>") displays “C <text>". """
     formatted_text = text.replace('_', ' ')
     return 'C {}'.format(formatted_text)
 
