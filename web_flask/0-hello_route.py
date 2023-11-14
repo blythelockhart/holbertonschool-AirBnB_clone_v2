@@ -1,4 +1,8 @@
 #!/usr/bin/python3
+"""
+Starts a Flask web application listening on 0.0.0.0, port 5000.
+The root route ("/") displays the message "Hello HBNB!".
+"""
 from flask import Flask
 
 app = Flask(__name__)
