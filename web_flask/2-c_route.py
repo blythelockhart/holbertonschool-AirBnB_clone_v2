@@ -5,7 +5,6 @@ Root route ("/") displays the message "Hello HBNB!".
 Root route ("/hbnb") displays “HBNB”.
 Root route ("/c/<text>") displays “C ” and the value of the text variable.
 """
-
 fromm flask import Flask, render_template
 
 app = Flask(__name__)
@@ -23,7 +22,7 @@ def display_hbnb():
 
 @app.route('/c/<text>', strict_slashes=False)
 def display_c_text(text):
-    # Replace underscores with spaces in the text variable
+    """ Replace underscores with spaces in the text variable """
     formatted_text = text.replace('_', ' ')
     return 'C {}'.format(formatted_text)
 
