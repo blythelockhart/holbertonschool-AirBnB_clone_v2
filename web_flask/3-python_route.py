@@ -18,7 +18,7 @@ def hbnb():
 
 
 @app.route('/c/<text>', strict_slashes=False)
-def c_route(text):
+def c_text(text):
     """ Root route ("/c/<text>") displays “C <text>". """
     text = text.replace('_', ' ')
     return 'C {}'.format(text)
@@ -26,7 +26,7 @@ def c_route(text):
 
 @app.route('/python/<text>', strict_slashes=False)
 @app.route('/python/', strict_slashes=False)
-def python_route(text='is cool'):
+def python_text(text='is cool'):
     """ Root route ("/python/<text>") displays "Python <text>". """
     text = text.replace('_', ' ')
     return 'Python {}'.format(text)

@@ -12,7 +12,7 @@ def hello_hbnb():
 
 
 @app.route('/hbnb', strict_slashes=False)
-def display_hbnb():
+def hbnb():
     """ Root route ("/hbnb") displays “HBNB”. """
     return 'HBNB'
 
