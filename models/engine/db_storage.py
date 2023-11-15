@@ -38,7 +38,7 @@ class DBStorage:
 
         if cls:
             if isinstance(cls, str):
-                cls = classes.get(cls, None)
+                cls = next((c for c in classes if c.__name__ == cls), None)
             objects = self.__session.query(cls).all()
         else:
             objects = []
