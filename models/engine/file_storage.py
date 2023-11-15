@@ -45,7 +45,7 @@ class FileStorage:
                     'Review': Review
                   }
         try:
-            with open(FileStorage.__file_path) as f:
+            with open(self.__file_path) as f:
                 temp = json.load(f)
                 time = "%Y-%m-%dT%H:%M:%S.%f"
 
@@ -71,4 +71,5 @@ class FileStorage:
 
     def close(self):
         """ Close the file and deserialize the JSON file to objects. """
+        
         self.reload()
