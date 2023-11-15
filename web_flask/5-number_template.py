@@ -25,7 +25,6 @@ def c_text(text):
 
 
 @app.route('/python/<text>', strict_slashes=False)
-@app.route('/python/', strict_slashes=False)
 def python_text(text="is cool"):
     """ Root route ("/python/<text>") displays "Python <text>". """
     text = text.replace('_', ' ')
@@ -35,15 +34,13 @@ def python_text(text="is cool"):
 @app.route('/number/<int:n>', strict_slashes=False)
 def number(n):
     """ Root route ("/number/<int:n>") displays "<int:n> is a number". """
-    if type(n) is int:
-        return "{} is a number".format(n)
+    return "{} is a number".format(n)
 
 
 @app.route('/number_template/<int:n>', strict_slashes=False)
 def number_template(n):
     """ Root route ("/number_template/<int:n>") displays an HTML page. """
-    if type(n) is int:
-        return render_template('5-number.html', n=n)
+    return render_template('5-number.html', n=n)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
